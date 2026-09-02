@@ -20,7 +20,7 @@ The package currently focuses on a persisted launch count. It increments when th
 Add this package as a dependency in `Package.swift`:
 
 ```swift
-.package(url: "<repository-url>", from: "0.1.0")
+.package(url: "https://github.com/Ausianovich/AppGlobalState.git", from: "1.0.0")
 ```
 
 Then add the products you need to your target:

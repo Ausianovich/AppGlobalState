@@ -5,18 +5,26 @@ import PackageDescription
 
 let package = Package(
     name: "AppGlobalState",
+    platforms: [
+        .macOS(.v26), .iOS(.v26)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "AppGlobalState",
             targets: ["AppGlobalState"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.0.0"),
+    ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "AppGlobalState"
+            name: "AppGlobalState",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "Sharing", package: "swift-sharing"),
+            ]
         ),
         .testTarget(
             name: "AppGlobalStateTests",

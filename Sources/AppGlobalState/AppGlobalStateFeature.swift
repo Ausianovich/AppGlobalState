@@ -37,7 +37,7 @@ public struct AppGlobalStateFeature: Reducer {
                     state.wasInBackground = true
 
                 case .inactive:
-                    break
+                    return .none
                 }
                 return .none
             }

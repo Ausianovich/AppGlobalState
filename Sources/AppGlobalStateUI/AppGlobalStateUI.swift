@@ -2,30 +2,13 @@ import AppGlobalState
 import ComposableArchitecture
 import SwiftUI
 
-
-
-extension AppGlobalStateStore.Phase {
-    init(_ scenePhase: ScenePhase) {
-        switch scenePhase {
-            case .active:
-            self = .active
-        case .background:
-            self = .background
-        case .inactive:
-            self = .inactive
-        @unknown default:
-            fatalError()
-        }
-    }
-}
-
 public extension View {
-    public func launchCounterObserver() -> some View {
+    func launchCounterObserver() -> some View {
         modifier(AppGlobalStateViewModifier())
     }
 }
 
-struct AppGlobalStateViewModifier: ViewModifier {
+private struct AppGlobalStateViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         AppGlobalStateContainer(store: Store(initialState: AppGlobalStateStore.State(), reducer: { AppGlobalStateStore() })) {
             content
@@ -33,8 +16,7 @@ struct AppGlobalStateViewModifier: ViewModifier {
     }
 }
 
-
-struct AppGlobalStateContainer<Content: View>: View {
+private struct AppGlobalStateContainer<Content: View>: View {
     @Environment(\.scenePhase) var scenePhase
     let store: StoreOf<AppGlobalStateStore>
     let content: Content
@@ -51,3 +33,4 @@ struct AppGlobalStateContainer<Content: View>: View {
             }
     }
 }
+

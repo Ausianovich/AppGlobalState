@@ -4,7 +4,7 @@ import Foundation
 
 public extension SharedReaderKey where Self == AppStorageKey<Int>.Default {
     static var launchCount: Self {
-        Self[.appStorage("contentLaunchCount"), default: 0]
+        Self[.appStorage("launchCount"), default: 0]
     }
 }
 

@@ -10,18 +10,20 @@ public extension View {
 
 private struct AppGlobalStateViewModifier: ViewModifier {
     func body(content: Content) -> some View {
-        AppGlobalStateContainer(store: Store(initialState: AppGlobalStateStore.State(), reducer: { AppGlobalStateStore() }),
-                                content: { content })
+        AppGlobalStateContainer {
+            content
+        }
     }
 }
 
 private struct AppGlobalStateContainer<Content: View>: View {
     @Environment(\.scenePhase) var scenePhase
-    let store: StoreOf<AppGlobalStateStore>
+    @State private var store = Store(initialState: AppGlobalStateStore.State()) {
+        AppGlobalStateStore()
+    }
     let content: Content
     
-    init(store: StoreOf<AppGlobalStateStore>, @ViewBuilder content: () -> Content) {
-        self.store = store
+    init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
     

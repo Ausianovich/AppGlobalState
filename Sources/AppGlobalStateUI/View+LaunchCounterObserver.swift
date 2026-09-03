@@ -10,9 +10,8 @@ public extension View {
 
 private struct AppGlobalStateViewModifier: ViewModifier {
     func body(content: Content) -> some View {
-        AppGlobalStateContainer(store: Store(initialState: AppGlobalStateStore.State(), reducer: { AppGlobalStateStore() })) {
-            content
-        }
+        AppGlobalStateContainer(store: Store(initialState: AppGlobalStateStore.State(), reducer: { AppGlobalStateStore() }),
+                                content: { content })
     }
 }
 

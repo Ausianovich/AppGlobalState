@@ -1,52 +1,59 @@
 import ComposableArchitecture
 import Sharing
+import Foundation
 
-public struct AppGlobalStateFeature: Reducer {
-    public init() {
+public extension SharedReaderKey where Self == AppStorageKey<Int>.Default {
+    static var launchCount: Self {
+        Self[.appStorage("contentLaunchCount"), default: 0]
     }
+}
 
+public extension SharedReaderKey where Self == AppStorageKey<Date>.Default {
+    static var backgroundTimeStamp: Self {
+        Self[.appStorage("backgroundTimeStamp"), default: .now]
+    }
+}
+
+@Reducer
+public struct AppGlobalStateStore {
+    @Dependency(\.date.now) var now
+    
+    public enum Phase {
+        case active
+        case background
+        case inactive
+    }
+    
+    public init() {}
+    
+    @ObservableState
     public struct State: Equatable {
-        @Shared(.appStorage("launchCount")) public var launchCount = 0
-        var wasInBackground = false
-
-        public init() {
-        }
+        @Shared(.launchCount) public var launchCount: Int
+        @Shared(.backgroundTimeStamp) public var timeStamp: Date
+        
+        public init() {}
     }
-
+    
     public enum Action {
-        case appStarted
-        case scenePhaseChanged(AppGlobalStateScenePhase)
+        case updateState(Phase)
     }
-
-    public var body: some ReducerOf<Self> {
+    
+    public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .appStarted:
-                incrementLaunchCount(&state)
-                return .none
-
-            case let .scenePhaseChanged(scenePhase):
-                switch scenePhase {
+            case .updateState(let phase):
+                switch phase {
                 case .active:
-                    if state.wasInBackground {
-                        state.wasInBackground = false
-                        incrementLaunchCount(&state)
-                    }
-
+                    guard (now.timeIntervalSince1970 - state.timeStamp.timeIntervalSince1970) >= 3 else { break }
+                    state.$launchCount.withLock { $0 += 1 }
                 case .background:
-                    state.wasInBackground = true
-
+                    state.$timeStamp.withLock { $0 = now }
                 case .inactive:
-                    return .none
+                    break
                 }
+                
                 return .none
             }
-        }
-    }
-
-    private func incrementLaunchCount(_ state: inout State) {
-        state.$launchCount.withLock {
-            $0 += 1
         }
     }
 }

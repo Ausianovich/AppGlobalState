@@ -30,8 +30,11 @@ public struct AppGlobalStateStore {
     public struct State: Equatable {
         @Shared(.launchCount) public var launchCount: Int
         @Shared(.backgroundTimeStamp) public var timeStamp: Date
+        var hasActivated = false
+        var isReturningFromBackground = false
         
         public init() {}
+
     }
     
     public enum Action {
@@ -44,10 +47,19 @@ public struct AppGlobalStateStore {
             case .updateState(let phase):
                 switch phase {
                 case .active:
-                    guard (now.timeIntervalSince1970 - state.timeStamp.timeIntervalSince1970) >= 3 else { break }
-                    state.$launchCount.withLock { $0 += 1 }
+                    let isColdStart = !state.hasActivated
+                    let hasBeenInBackgroundLongEnough = state.isReturningFromBackground
+                        && now.timeIntervalSince(state.timeStamp) >= 3
+
+                    if isColdStart || hasBeenInBackgroundLongEnough {
+                        state.$launchCount.withLock { $0 += 1 }
+                    }
+
+                    state.hasActivated = true
+                    state.isReturningFromBackground = false
                 case .background:
                     state.$timeStamp.withLock { $0 = now }
+                    state.isReturningFromBackground = true
                 case .inactive:
                     break
                 }
